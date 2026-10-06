@@ -1,0 +1,35 @@
+{
+  "name": "@risingtideresearch/chartroom",
+  "version": "0.1.0",
+  "description": "Application-independent marine data contracts, schemas and conformance fixtures",
+  "type": "module",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/risingtideresearch/chartroom.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "formats/",
+    "catalog.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    "./catalog.json": "./catalog.json",
+    "./formats/*": "./formats/*"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "npm test && npm run formatcheck",
+    "format": "prettier --write .",
+    "formatcheck": "prettier --check ."
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "prettier": "^3.9.9"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "formats": [
+    {
+      "format": "hydrostatic-table",
+      "version": 1,
+      "status": "draft",
+      "schema": "formats/hydrostatic-table/v1/schema.json",
+      "specification": "formats/hydrostatic-table/v1/specification.md",
+      "examples": [
+        "formats/hydrostatic-table/v1/examples/upright-box.json",
+        "formats/hydrostatic-table/v1/examples/box.json"
+      ]
+    }
+  ]
+}
