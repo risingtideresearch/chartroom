@@ -10,24 +10,26 @@ interchange data, not hull geometry algorithms, application state, or solver cac
 | ----------------- | ------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
 | Hydrostatic table | 1       | Draft  | [Specification](formats/hydrostatic-table/v1/specification.md) · [Schema](formats/hydrostatic-table/v1/schema.json) |
 
-The [catalog](catalog.json) lists the available contracts and their paths.
+The [catalog](catalog.json) lists the available contracts, their paths, and the
+TypeScript root types used to generate their schemas.
 Hydrostatic table v1 describes the static buoyancy response of one fixed closed
 hull envelope, independently of a loading condition or water density. It was
 extracted from Camber without changing its structural or physical semantics.
 
 ## Consume a GitHub release
 
-Once this repository has been pushed and tagged `v0.1.0`:
+After this repository has been pushed and tagged `v0.1.1`:
 
 ```sh
 npm install --save-dev --save-exact \
-  'github:risingtideresearch/chartroom#v0.1.0'
+  'github:risingtideresearch/chartroom#v0.1.1'
 ```
 
-The package name is `@risingtideresearch/chartroom`. It contains committed JSON and
-Markdown artifacts; installation requires no build or generation step. Use a
-regular dependency instead of a dev dependency if the application loads schemas
-at runtime. Commit the consumer's lockfile, which records the resolved Git commit.
+The package name is `@risingtideresearch/chartroom`. It contains committed JSON,
+Markdown, and type-only TypeScript artifacts; installation requires no build or
+generation step. Use a regular dependency instead of a dev dependency if the
+application loads schemas at runtime. Commit the consumer's lockfile, which
+records the resolved Git commit.
 
 For example, a Node-based exporter test can replace its local schema read with:
 
@@ -43,6 +45,15 @@ const schema = JSON.parse(
   ),
 );
 ```
+
+TypeScript consumers can import the type-only contract:
+
+```ts
+import type { HydrostaticTable } from "@risingtideresearch/chartroom/formats/hydrostatic-table/v1";
+```
+
+This subpath has no runtime API. TypeScript types do not validate JSON, enforce
+JSDoc bounds, reject all extra fields, or enforce the volume/center relationship.
 
 Use a JSON Schema draft-07 validator. Validation libraries are not runtime
 package dependencies; consumers choose their own. Schemas are loaded locally,
@@ -65,6 +76,36 @@ npm run check
 npm pack --dry-run
 ```
 
+### Authoring schemas
+
+Edit [`types.ts`](formats/hydrostatic-table/v1/types.ts), not `schema.json`.
+Use ordinary interfaces, literal types, optional properties, unions, and labelled
+tuples. JSDoc supplies human descriptions and local constraints such as
+`@minimum`, `@exclusiveMaximum`, `@minLength`, `@minItems`, `@minProperties`, and
+`@format`.
+
+```sh
+npm run generate       # Regenerate and format committed JSON Schemas
+npm run check          # Typecheck, verify generation freshness, test, and formatcheck
+```
+
+The pinned `ts-json-schema-generator` emits draft-07 with unknown core fields
+rejected. Only explicit index signatures, such as `extensions`, allow arbitrary
+keys. Generation preserves field declaration order and derives release `$id`
+URLs from the package version and catalog paths.
+
+All structural constraints come from `types.ts`; there are no schema overrides.
+`Sample` is a union of `DrySample` (zero volume, null center) and `ImmersedSample`
+(positive volume, point center). A shared interface holds the common properties.
+The `Positive` alias uses `@exclusiveMinimum 0`, so the generated branches enforce
+the relationship without a hand-written conditional. TypeScript itself still
+sees `Positive` as `number`; consumers must validate at runtime. Cross-row and
+physical semantics remain in `specification.md`, exercised by conformance tests.
+
+CI verifies that committed schemas match their sources without rewriting them.
+Generation tools are development dependencies only; consumers still load the
+committed schema without installing a generator or running a build.
+
 Tests validate the schemas, all examples, and valid fixtures. Invalid fixtures
 are classified in `fixtures/manifest.json`: structural failures must fail JSON
 Schema validation; semantic failures must pass it and violate the named semantic
@@ -74,7 +115,7 @@ CI runs these checks and checks the package contents.
 
 ## Versioning and releases
 
-- A **repository/package release** (`v0.1.0`) versions the whole collection.
+- A **repository/package release** (`v0.1.1`) versions the whole collection.
 - A **format version** (`hydrostatic-table/v1`, `"version": 1`) versions one data
   contract. Formats evolve independently.
 - Draft contracts may change, including incompatibly, but every change must be
@@ -87,15 +128,16 @@ CI runs these checks and checks the package contents.
 Before a release:
 
 1. Update `package.json`, the lockfile, and `CHANGELOG.md`.
-2. Update schema `$id` URLs to the intended release tag. Paths within each format
-   remain unchanged; examples use local relative schema references.
+2. Run `npm run generate` to update schema `$id` URLs to the intended release
+   tag. Paths within each format remain unchanged; examples use local relative
+   schema references.
 3. Run `npm ci`, `npm run check`, and `npm pack --dry-run`.
 4. Commit the release, then create and push its annotated tag:
 
 ```sh
-git tag -a v0.1.0 -m "Release v0.1.0"
+git tag -a v0.1.1 -m "Release v0.1.1"
 git push origin main
-git push origin v0.1.0
+git push origin v0.1.1
 ```
 
 There is no npm publishing step. A future npm release can use the same layout.
@@ -115,7 +157,10 @@ not modify Camber or introduce a dependency on an unpublished release.
 
 ## Add a format
 
-Create `formats/<name>/v<version>/` with `schema.json`, `specification.md`,
-`examples/`, and `fixtures/valid/` and `fixtures/invalid/`. Add it to the catalog
-and supply format-specific conformance tests. Share definitions only when
+Create `formats/<name>/v<version>/` with `types.ts`, `specification.md`,
+`examples/`, and `fixtures/valid/` and `fixtures/invalid/`. Add the format to the
+catalog, including its `types` path, `schemaType` root interface name, and generated
+`schema` path.
+Add a type-only package export for its directory, run `npm run generate`, and
+supply format-specific conformance tests. Share definitions only when
 multiple real contracts need the same semantics; avoid speculative abstractions.

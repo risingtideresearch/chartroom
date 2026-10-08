@@ -37,6 +37,11 @@ for (const contract of catalog.formats) {
       readFileSync(new URL(contract.specification, root), "utf8").length,
     );
     assert.ok(contract.examples.length);
+    assert.ok(readFileSync(new URL(contract.types, root), "utf8").length);
+    assert.equal(
+      pkg.exports[`./${directory.slice(0, -1)}`].types,
+      `./${contract.types}`,
+    );
   });
 
   const validFixtures = readdirSync(

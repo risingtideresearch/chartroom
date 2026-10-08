@@ -1,338 +1,234 @@
 {
-  "$id": "https://raw.githubusercontent.com/risingtideresearch/chartroom/v0.1.0/formats/hydrostatic-table/v1/schema.json",
+  "$id": "https://raw.githubusercontent.com/risingtideresearch/chartroom/v0.1.1/formats/hydrostatic-table/v1/schema.json",
+  "$comment": "Generated from types.ts. Do not edit; run npm run generate.",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Hydrostatic table — v1 draft",
-  "description": "Static buoyancy response of a fixed closed envelope. See specification.md for coordinate, interpolation and cross-row validation rules not expressible here.",
   "type": "object",
-  "additionalProperties": false,
-  "required": ["format", "version", "frame", "body", "table"],
   "properties": {
     "$schema": {
       "type": "string",
-      "format": "uri-reference",
-      "description": "Optional URI reference to the document's structural schema."
+      "description": "Optional URI reference to the document's structural schema.",
+      "format": "uri-reference"
     },
-    "format": {
-      "const": "hydrostatic-table"
-    },
-    "version": {
-      "const": 1
-    },
-    "name": {
-      "$ref": "#/definitions/nonemptyString"
-    },
-    "frame": {
-      "$ref": "#/definitions/frame"
-    },
-    "body": {
-      "$ref": "#/definitions/body"
-    },
-    "table": {
-      "$ref": "#/definitions/table"
-    },
-    "referenceState": {
-      "$ref": "#/definitions/referenceState"
-    },
+    "format": { "type": "string", "const": "hydrostatic-table" },
+    "version": { "type": "number", "const": 1 },
+    "name": { "$ref": "#/definitions/NonemptyString" },
+    "frame": { "$ref": "#/definitions/Frame" },
+    "body": { "$ref": "#/definitions/Body" },
+    "table": { "$ref": "#/definitions/Table" },
+    "referenceState": { "$ref": "#/definitions/ReferenceState" },
     "immersionMarkers": {
       "type": "array",
-      "items": {
-        "$ref": "#/definitions/immersionMarker"
-      }
+      "items": { "$ref": "#/definitions/ImmersionMarker" }
     },
-    "source": {
-      "$ref": "#/definitions/source"
-    },
-    "notes": {
-      "$ref": "#/definitions/notes"
-    },
+    "source": { "$ref": "#/definitions/Source" },
+    "notes": { "$ref": "#/definitions/Notes" },
     "extensions": {
       "type": "object",
+      "additionalProperties": {},
       "description": "Namespaced supplemental metadata only. Must not override core semantics."
     }
   },
+  "required": ["format", "version", "frame", "body", "table"],
+  "additionalProperties": false,
+  "description": "Static buoyancy response of a fixed closed envelope. See specification.md for coordinate, interpolation and cross-row validation rules not expressible here.",
+  "title": "Hydrostatic table — v1 draft",
   "definitions": {
-    "nonemptyString": {
-      "type": "string",
-      "minLength": 1
-    },
-    "notes": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/nonemptyString"
-      }
-    },
-    "pointM": {
-      "type": "array",
-      "description": "Hull-fixed [x, y, z] in metres.",
-      "minItems": 3,
-      "maxItems": 3,
-      "items": {
-        "type": "number"
-      }
-    },
-    "centerplanePointM": {
-      "type": "array",
-      "description": "Hull-fixed [x, 0, z] in metres.",
-      "minItems": 3,
-      "maxItems": 3,
-      "items": [
-        {
-          "type": "number"
-        },
-        {
-          "const": 0
-        },
-        {
-          "type": "number"
-        }
-      ],
-      "additionalItems": false
-    },
-    "heelDeg": {
-      "type": "number",
-      "minimum": -180,
-      "maximum": 180,
-      "description": "Positive heel lowers starboard. See the normative rotation order."
-    },
-    "trimDeg": {
-      "type": "number",
-      "exclusiveMinimum": -90,
-      "exclusiveMaximum": 90,
-      "description": "Positive trim raises the bow near upright. See the normative rotation order."
-    },
-    "frame": {
+    "NonemptyString": { "type": "string", "minLength": 1 },
+    "Frame": {
       "type": "object",
-      "additionalProperties": false,
+      "properties": {
+        "axes": { "type": "string", "const": "x-forward-y-port-z-up" },
+        "originDescription": { "$ref": "#/definitions/NonemptyString" },
+        "knReferenceM": { "$ref": "#/definitions/CenterplanePointM" }
+      },
       "required": ["axes", "originDescription", "knReferenceM"],
-      "properties": {
-        "axes": {
-          "const": "x-forward-y-port-z-up"
-        },
-        "originDescription": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "knReferenceM": {
-          "$ref": "#/definitions/centerplanePointM"
-        }
-      }
+      "additionalProperties": false
     },
-    "body": {
+    "CenterplanePointM": {
+      "type": "array",
+      "minItems": 3,
+      "items": [
+        { "type": "number", "title": "x" },
+        { "type": "number", "const": 0, "title": "y" },
+        { "type": "number", "title": "z" }
+      ],
+      "maxItems": 3,
+      "description": "Hull-fixed [x, 0, z] in metres."
+    },
+    "Body": {
       "type": "object",
-      "additionalProperties": false,
+      "properties": {
+        "description": { "$ref": "#/definitions/NonemptyString" },
+        "buoyancyEnvelope": { "type": "string", "const": "closed-watertight" }
+      },
       "required": ["description", "buoyancyEnvelope"],
-      "properties": {
-        "description": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "buoyancyEnvelope": {
-          "const": "closed-watertight"
-        }
-      }
+      "additionalProperties": false
     },
-    "table": {
+    "Table": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["interpolation", "rows"],
       "properties": {
         "interpolation": {
+          "type": "string",
           "const": "linear",
           "description": "Linear in immersion, heel and trim, interpolating volume and derived volume first moments rather than independently interpolating centroids."
         },
         "rows": {
           "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/row"
-          },
-          "description": "Complete Cartesian product of sampled angles, sorted by trim then heel. Cross-row constraints require semantic validation."
+          "items": { "$ref": "#/definitions/Row" },
+          "description": "Complete Cartesian product of sampled angles, sorted by trim then heel. Cross-row constraints require semantic validation.",
+          "minItems": 1
         }
-      }
+      },
+      "required": ["interpolation", "rows"],
+      "additionalProperties": false
     },
-    "row": {
+    "Row": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["heelDeg", "trimDeg", "samples"],
       "properties": {
-        "heelDeg": {
-          "$ref": "#/definitions/heelDeg"
-        },
-        "trimDeg": {
-          "$ref": "#/definitions/trimDeg"
-        },
+        "heelDeg": { "$ref": "#/definitions/HeelDeg" },
+        "trimDeg": { "$ref": "#/definitions/TrimDeg" },
         "samples": {
           "type": "array",
-          "minItems": 2,
-          "items": {
-            "$ref": "#/definitions/sample"
-          },
-          "description": "Strictly increasing offsets and nondecreasing volumes; offsets may differ between attitude rows."
+          "items": { "$ref": "#/definitions/Sample" },
+          "description": "Strictly increasing offsets and nondecreasing volumes; offsets may differ between attitude rows.",
+          "minItems": 2
         }
-      }
+      },
+      "required": ["heelDeg", "trimDeg", "samples"],
+      "additionalProperties": false
     },
-    "sample": {
+    "HeelDeg": {
+      "type": "number",
+      "description": "Positive heel lowers starboard. See the normative rotation order.",
+      "minimum": -180,
+      "maximum": 180
+    },
+    "TrimDeg": {
+      "type": "number",
+      "description": "Positive trim raises the bow near upright. See the normative rotation order.",
+      "exclusiveMinimum": -90,
+      "exclusiveMaximum": 90
+    },
+    "Sample": {
+      "anyOf": [
+        { "$ref": "#/definitions/DrySample" },
+        { "$ref": "#/definitions/ImmersedSample" }
+      ],
+      "description": "A dry sample has zero volume and a null center; an immersed sample has positive volume and a hull-fixed center. The Positive bound is enforced by JSON Schema, not TypeScript, so the union still requires runtime validation."
+    },
+    "DrySample": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["waterplaneOffsetM", "volumeM3", "buoyancyCenterM"],
       "properties": {
         "waterplaneOffsetM": {
           "type": "number",
           "description": "Signed plane offset h: submerged points satisfy n dot r <= h. Not draft."
         },
-        "volumeM3": {
-          "type": "number",
-          "minimum": 0
-        },
-        "buoyancyCenterM": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/pointM"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
         "waterplane": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/waterplane"
-            },
-            {
-              "type": "null"
-            }
-          ],
+          "anyOf": [{ "$ref": "#/definitions/Waterplane" }, { "type": "null" }],
           "description": "Omitted means unknown; null means known to have no free waterplane."
         },
-        "wettedAreaM2": {
-          "type": "number",
-          "minimum": 0
-        }
+        "wettedAreaM2": { "$ref": "#/definitions/NonNegative" },
+        "volumeM3": { "type": "number", "const": 0 },
+        "buoyancyCenterM": { "type": "null" }
       },
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "volumeM3": {
-                "const": 0
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "buoyancyCenterM": {
-                "type": "null"
-              }
-            }
-          },
-          "else": {
-            "properties": {
-              "buoyancyCenterM": {
-                "$ref": "#/definitions/pointM"
-              }
-            }
-          }
-        }
-      ]
+      "required": ["buoyancyCenterM", "volumeM3", "waterplaneOffsetM"],
+      "additionalProperties": false
     },
-    "waterplane": {
+    "Waterplane": {
       "type": "object",
-      "additionalProperties": false,
+      "properties": {
+        "areaM2": { "$ref": "#/definitions/Positive" },
+        "centroidM": { "$ref": "#/definitions/PointM" },
+        "secondMomentsM4": { "$ref": "#/definitions/SecondMomentsM4" }
+      },
       "required": ["areaM2"],
-      "properties": {
-        "areaM2": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "centroidM": {
-          "$ref": "#/definitions/pointM"
-        },
-        "secondMomentsM4": {
-          "$ref": "#/definitions/secondMomentsM4"
-        }
-      }
+      "additionalProperties": false
     },
-    "secondMomentsM4": {
+    "Positive": { "type": "number", "exclusiveMinimum": 0 },
+    "PointM": {
+      "type": "array",
+      "minItems": 3,
+      "items": [
+        { "type": "number", "title": "x" },
+        { "type": "number", "title": "y" },
+        { "type": "number", "title": "z" }
+      ],
+      "maxItems": 3,
+      "description": "Hull-fixed [x, y, z] in metres."
+    },
+    "SecondMomentsM4": {
       "type": "object",
+      "properties": {
+        "xx": { "$ref": "#/definitions/NonNegative" },
+        "xy": { "type": "number" },
+        "yy": { "$ref": "#/definitions/NonNegative" }
+      },
       "additionalProperties": false,
-      "minProperties": 1,
       "description": "Central integrals of X squared, X times Y and Y squared in the rotated world-horizontal frame. Missing components are unknown, not zero. A complete matrix must be positive semidefinite.",
-      "properties": {
-        "xx": {
-          "type": "number",
-          "minimum": 0
-        },
-        "xy": {
-          "type": "number"
-        },
-        "yy": {
-          "type": "number",
-          "minimum": 0
-        }
-      }
+      "minProperties": 1
     },
-    "referenceState": {
+    "NonNegative": { "type": "number", "minimum": 0 },
+    "ImmersedSample": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["heelDeg", "trimDeg", "waterplaneOffsetM"],
       "properties": {
-        "heelDeg": {
-          "$ref": "#/definitions/heelDeg"
-        },
-        "trimDeg": {
-          "$ref": "#/definitions/trimDeg"
-        },
         "waterplaneOffsetM": {
-          "type": "number"
-        }
-      }
+          "type": "number",
+          "description": "Signed plane offset h: submerged points satisfy n dot r <= h. Not draft."
+        },
+        "waterplane": {
+          "anyOf": [{ "$ref": "#/definitions/Waterplane" }, { "type": "null" }],
+          "description": "Omitted means unknown; null means known to have no free waterplane."
+        },
+        "wettedAreaM2": { "$ref": "#/definitions/NonNegative" },
+        "volumeM3": { "$ref": "#/definitions/Positive" },
+        "buoyancyCenterM": { "$ref": "#/definitions/PointM" }
+      },
+      "required": ["buoyancyCenterM", "volumeM3", "waterplaneOffsetM"],
+      "additionalProperties": false
     },
-    "immersionMarker": {
+    "ReferenceState": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "label", "kind", "pointsM"],
       "properties": {
-        "id": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "label": {
-          "$ref": "#/definitions/nonemptyString"
-        },
+        "heelDeg": { "$ref": "#/definitions/HeelDeg" },
+        "trimDeg": { "$ref": "#/definitions/TrimDeg" },
+        "waterplaneOffsetM": { "type": "number" }
+      },
+      "required": ["heelDeg", "trimDeg", "waterplaneOffsetM"],
+      "additionalProperties": false
+    },
+    "ImmersionMarker": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "label": { "$ref": "#/definitions/NonemptyString" },
         "kind": {
+          "type": "string",
           "enum": ["deck-edge", "downflooding", "reference"]
         },
         "pointsM": {
           "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/pointM"
-          }
+          "items": { "$ref": "#/definitions/PointM" },
+          "minItems": 1
         }
-      }
+      },
+      "required": ["id", "label", "kind", "pointsM"],
+      "additionalProperties": false
     },
-    "source": {
+    "Source": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "tool": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "toolVersion": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "modelId": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "generatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "method": {
-          "$ref": "#/definitions/nonemptyString"
-        },
-        "notes": {
-          "$ref": "#/definitions/notes"
-        }
-      }
+        "tool": { "$ref": "#/definitions/NonemptyString" },
+        "toolVersion": { "$ref": "#/definitions/NonemptyString" },
+        "modelId": { "$ref": "#/definitions/NonemptyString" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "method": { "$ref": "#/definitions/NonemptyString" },
+        "notes": { "$ref": "#/definitions/Notes" }
+      },
+      "additionalProperties": false
+    },
+    "Notes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/NonemptyString" }
     }
   }
 }

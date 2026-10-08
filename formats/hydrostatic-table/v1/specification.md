@@ -5,8 +5,15 @@ contract describes the static buoyancy response of one fixed hull envelope. It
 contains no Camber document state, loading condition, water density, stability
 criteria, interpolation caches or mesh.
 
-- Structural schema: [hydrostatic-table.schema.json](schema.json)
+- Structural schema: [schema.json](schema.json)
+- Readable type definitions: [types.ts](types.ts)
 - Numerical example: [box.json](examples/box.json)
+
+The structural schema is generated from [TypeScript types](types.ts) and their
+JSDoc constraints. A dry/immersed sample union describes the volume/center
+relationship; the generated JSON Schema also enforces the positive-volume bound
+that TypeScript cannot express. Neither replaces the numerical and cross-field
+validation rules in this specification.
 
 The intended pipeline is:
 

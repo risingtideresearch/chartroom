@@ -1,6 +1,6 @@
 {
   "name": "@risingtideresearch/chartroom",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Application-independent marine data contracts, schemas and conformance fixtures",
   "type": "module",
   "license": "UNLICENSED",
@@ -18,18 +18,26 @@
     "CHANGELOG.md"
   ],
   "exports": {
+    "./formats/hydrostatic-table/v1": {
+      "types": "./formats/hydrostatic-table/v1/types.ts"
+    },
     "./catalog.json": "./catalog.json",
     "./formats/*": "./formats/*"
   },
   "scripts": {
+    "generate": "node scripts/generate-schemas.mjs",
+    "generatecheck": "node scripts/generate-schemas.mjs --check",
+    "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.mjs",
-    "check": "npm test && npm run formatcheck",
+    "check": "npm run typecheck && npm run generatecheck && npm test && npm run formatcheck",
     "format": "prettier --write .",
     "formatcheck": "prettier --check ."
   },
   "devDependencies": {
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "prettier": "^3.9.9"
+    "prettier": "^3.9.9",
+    "ts-json-schema-generator": "2.9.0",
+    "typescript": "5.9.3"
   }
 }
