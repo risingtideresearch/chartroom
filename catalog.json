@@ -9,7 +9,9 @@
       "examples": [
         "formats/hydrostatic-table/v1/examples/upright-box.json",
         "formats/hydrostatic-table/v1/examples/box.json"
-      ]
+      ],
+      "types": "formats/hydrostatic-table/v1/types.ts",
+      "schemaType": "HydrostaticTable"
     }
   ]
 }
