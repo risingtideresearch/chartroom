@@ -22,7 +22,10 @@
       "types": "./formats/hydrostatic-table/v1/types.ts"
     },
     "./catalog.json": "./catalog.json",
-    "./formats/*": "./formats/*"
+    "./formats/*": "./formats/*",
+    "./formats/marine-geometry/v1": {
+      "types": "./formats/marine-geometry/v1/types.ts"
+    }
   },
   "scripts": {
     "generate": "node scripts/generate-schemas.mjs",

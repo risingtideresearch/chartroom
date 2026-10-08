@@ -1,0 +1,39 @@
+{
+  "$schema": "../../schema.json",
+  "format": "marine-geometry",
+  "version": 1,
+  "frame": {
+    "axes": "x-forward-y-port-z-up",
+    "originDescription": "Authored origin"
+  },
+  "meshes": [
+    {
+      "id": "m",
+      "verticesM": [
+        [0, 0, 0],
+        [1, 0, 0],
+        [0, 1, 0]
+      ],
+      "triangles": [[0, 1, 2]],
+      "regions": [
+        {
+          "id": "r",
+          "representation": "physical",
+          "triangleIndices": [0]
+        }
+      ]
+    }
+  ],
+  "bodies": [
+    {
+      "id": "h",
+      "kind": "hull",
+      "regions": [
+        {
+          "meshId": "m",
+          "regionId": "r"
+        }
+      ]
+    }
+  ]
+}

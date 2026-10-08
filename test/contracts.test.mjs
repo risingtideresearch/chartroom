@@ -3,7 +3,13 @@ import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { semanticErrors } from "./hydrostatic-semantics.mjs";
+import { semanticErrors as hydrostaticErrors } from "./hydrostatic-semantics.mjs";
+import { semanticErrors as geometryErrors } from "./marine-geometry-semantics.mjs";
+
+const semanticChecks = {
+  "hydrostatic-table": hydrostaticErrors,
+  "marine-geometry": geometryErrors,
+};
 
 const root = new URL("../", import.meta.url);
 const read = (path) => JSON.parse(readFileSync(new URL(path, root), "utf8"));
@@ -13,6 +19,12 @@ const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
 for (const contract of catalog.formats) {
+  const semanticErrors = semanticChecks[contract.format];
+  assert.equal(
+    typeof semanticErrors,
+    "function",
+    `Missing semantic checker: ${contract.format}`,
+  );
   const directory = contract.schema.slice(
     0,
     contract.schema.lastIndexOf("/") + 1,
@@ -87,6 +99,9 @@ for (const contract of catalog.formats) {
       }
     });
   }
+
+  // These regressions exercise hydrostatic-table-specific numerical semantics.
+  if (contract.format !== "hydrostatic-table") continue;
 
   test("overflow from syntactically valid JSON is not finite", () => {
     const document = read(contract.examples[0]);

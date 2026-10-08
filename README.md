@@ -6,15 +6,22 @@ interchange data, not hull geometry algorithms, application state, or solver cac
 
 ## Formats
 
-| Format            | Version | Status | Contract                                                                                                            |
-| ----------------- | ------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
-| Hydrostatic table | 1       | Draft  | [Specification](formats/hydrostatic-table/v1/specification.md) · [Schema](formats/hydrostatic-table/v1/schema.json) |
+| Format            | Version | Status       | Contract                                                                                                            |
+| ----------------- | ------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Hydrostatic table | 1       | Draft        | [Specification](formats/hydrostatic-table/v1/specification.md) · [Schema](formats/hydrostatic-table/v1/schema.json) |
+| Marine geometry   | 1       | Experimental | [Specification](formats/marine-geometry/v1/specification.md) · [Schema](formats/marine-geometry/v1/schema.json)     |
 
 The [catalog](catalog.json) lists the available contracts, their paths, and the
 TypeScript root types used to generate their schemas.
 Hydrostatic table v1 describes the static buoyancy response of one fixed closed
 hull envelope, independently of a loading condition or water density. It was
 extracted from Camber without changing its structural or physical semantics.
+
+Marine geometry v1 is an unreleased experiment: a whole-geometry mesh snapshot
+with named surface regions, explicit hull bodies, optional closed analysis
+envelopes, and reference geometry. It is intended as source data for views,
+geometric weight estimates, and physics importers—not editable CAD or solver
+caches. It has no dependency on Camber or Boatmath.
 
 ## Consume a GitHub release
 
@@ -118,7 +125,7 @@ CI runs these checks and checks the package contents.
 - A **repository/package release** (`v0.1.1`) versions the whole collection.
 - A **format version** (`hydrostatic-table/v1`, `"version": 1`) versions one data
   contract. Formats evolve independently.
-- Draft contracts may change, including incompatibly, but every change must be
+- Draft and experimental contracts may change, including incompatibly, but every change must be
   documented in the changelog and released under a new repository tag.
 - Once a contract is stable, incompatible structure or semantics require a new
   format version. Do not reinterpret an existing stable version.

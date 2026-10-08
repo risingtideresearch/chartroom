@@ -1,0 +1,331 @@
+{
+  "$id": "https://raw.githubusercontent.com/risingtideresearch/chartroom/v0.1.1/formats/marine-geometry/v1/schema.json",
+  "$comment": "Generated from types.ts. Do not edit; run npm run generate.",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional structural schema reference.",
+      "format": "uri-reference"
+    },
+    "format": { "type": "string", "const": "marine-geometry" },
+    "version": { "type": "number", "const": 1 },
+    "name": { "$ref": "#/definitions/NonemptyString" },
+    "frame": { "$ref": "#/definitions/Frame" },
+    "meshes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/TriangleMesh" },
+      "description": "Complete available geometry, including topsides; not just wetted surfaces.",
+      "minItems": 1
+    },
+    "bodies": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Body" },
+      "description": "Explicit membership; consumers must not infer hulls from connectivity.",
+      "minItems": 1
+    },
+    "envelopes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Envelope" },
+      "description": "Optional explicitly closed analysis boundaries. Missing means not supplied."
+    },
+    "references": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/ReferenceGeometry" }
+    },
+    "referenceState": { "$ref": "#/definitions/ReferenceState" },
+    "source": { "$ref": "#/definitions/Source" },
+    "notes": { "$ref": "#/definitions/Notes" },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": {},
+      "description": "Namespaced supplemental metadata only. Must not override core semantics."
+    }
+  },
+  "required": ["format", "version", "frame", "meshes", "bodies"],
+  "additionalProperties": false,
+  "description": "Portable sampled marine geometry for drawing and measurement, not an editable hull design, loading condition, solver cache, or promise of solver suitability.",
+  "title": "Marine geometry — v1 experiment",
+  "definitions": {
+    "NonemptyString": { "type": "string", "minLength": 1 },
+    "Frame": {
+      "type": "object",
+      "properties": {
+        "axes": { "type": "string", "const": "x-forward-y-port-z-up" },
+        "originDescription": { "$ref": "#/definitions/NonemptyString" }
+      },
+      "required": ["axes", "originDescription"],
+      "additionalProperties": false
+    },
+    "TriangleMesh": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "verticesM": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PointM" },
+          "description": "Shared vertices use shared indices; nearby vertices are not implicitly welded.",
+          "minItems": 3
+        },
+        "triangles": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Triangle" },
+          "description": "Winding defines the face normal by (b-a) cross (c-a).",
+          "minItems": 1
+        },
+        "regions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/SurfaceRegion" },
+          "description": "A disjoint, exhaustive partition of this mesh's triangles.",
+          "minItems": 1
+        }
+      },
+      "required": ["id", "verticesM", "triangles", "regions"],
+      "additionalProperties": false
+    },
+    "PointM": {
+      "type": "array",
+      "minItems": 3,
+      "items": [
+        { "type": "number", "title": "x" },
+        { "type": "number", "title": "y" },
+        { "type": "number", "title": "z" }
+      ],
+      "maxItems": 3,
+      "description": "Hull-fixed [x, y, z] in metres."
+    },
+    "Triangle": {
+      "type": "array",
+      "minItems": 3,
+      "items": [
+        { "$ref": "#/definitions/Index", "title": "a" },
+        { "$ref": "#/definitions/Index", "title": "b" },
+        { "$ref": "#/definitions/Index", "title": "c" }
+      ],
+      "maxItems": 3
+    },
+    "Index": {
+      "type": "integer",
+      "description": "A zero-based index. The upper bound requires cross-field validation.",
+      "minimum": 0
+    },
+    "SurfaceRegion": {
+      "anyOf": [
+        { "$ref": "#/definitions/NonIdealizedSurfaceRegion" },
+        { "$ref": "#/definitions/IdealizedSurfaceRegion" }
+      ],
+      "description": "Named selection for drawing or measuring. IDs are local to a mesh; no category automatically implies shell area, wetted area, or inclusion in a volume."
+    },
+    "NonIdealizedSurfaceRegion": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "triangleIndices": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Index" },
+          "description": "Explicit membership; indices are local to the containing mesh.",
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "representation": {
+          "type": "string",
+          "enum": ["physical", "reference"]
+        },
+        "description": { "$ref": "#/definitions/NonemptyString" }
+      },
+      "required": ["id", "representation", "triangleIndices"],
+      "additionalProperties": false
+    },
+    "IdealizedSurfaceRegion": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "triangleIndices": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Index" },
+          "description": "Explicit membership; indices are local to the containing mesh.",
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "representation": { "type": "string", "const": "idealized" },
+        "description": {
+          "$ref": "#/definitions/NonemptyString",
+          "description": "Explain what was assumed; an idealization must not be silently physical."
+        }
+      },
+      "required": ["description", "id", "representation", "triangleIndices"],
+      "additionalProperties": false
+    },
+    "Body": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "kind": {
+          "type": "string",
+          "enum": ["hull", "appendage", "structure", "reference", "other"]
+        },
+        "regions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RegionRef" },
+          "description": "The body's source surfaces, including any disclosed idealizations.",
+          "minItems": 1
+        },
+        "centerplaneYM": {
+          "type": "number",
+          "description": "Optional body centreplane y in the shared frame; does not assert symmetry."
+        }
+      },
+      "required": ["id", "kind", "regions"],
+      "additionalProperties": false,
+      "description": "One named component, not necessarily a closed volume. A surface region belongs to exactly one body. A multihull has distinct hull bodies even if a deck joins them."
+    },
+    "RegionRef": {
+      "type": "object",
+      "properties": {
+        "meshId": { "$ref": "#/definitions/NonemptyString" },
+        "regionId": { "$ref": "#/definitions/NonemptyString" }
+      },
+      "required": ["meshId", "regionId"],
+      "additionalProperties": false
+    },
+    "Envelope": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "bodyId": {
+          "$ref": "#/definitions/NonemptyString",
+          "description": "The body this envelope represents."
+        },
+        "boundary": { "type": "string", "const": "closed-watertight" },
+        "description": {
+          "$ref": "#/definitions/NonemptyString",
+          "description": "Explain included surfaces, appendages, caps and other closure assumptions."
+        },
+        "regions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RegionRef" },
+          "description": "Selected regions of that body; reference geometry must not bound a volume.",
+          "minItems": 1
+        }
+      },
+      "required": ["id", "bodyId", "boundary", "description", "regions"],
+      "additionalProperties": false,
+      "description": "Explicit outward-oriented closed boundary of an analysis volume. Consumers must validate closure and orientation; the declaration is not a validation result."
+    },
+    "ReferenceGeometry": {
+      "anyOf": [
+        { "$ref": "#/definitions/ReferencePoint" },
+        { "$ref": "#/definitions/ReferencePlane" },
+        { "$ref": "#/definitions/ReferencePolyline" }
+      ],
+      "description": "All reference geometry uses the document's hull-fixed frame."
+    },
+    "ReferencePoint": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "kind": { "type": "string", "const": "point" },
+        "pointM": { "$ref": "#/definitions/PointM" }
+      },
+      "required": ["id", "kind", "pointM"],
+      "additionalProperties": false
+    },
+    "ReferencePlane": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "kind": { "type": "string", "const": "plane" },
+        "normal": {
+          "$ref": "#/definitions/UnitVector",
+          "description": "Plane equation: normal dot r = offsetM."
+        },
+        "offsetM": { "type": "number" }
+      },
+      "required": ["id", "kind", "normal", "offsetM"],
+      "additionalProperties": false
+    },
+    "UnitVector": {
+      "type": "array",
+      "minItems": 3,
+      "items": [
+        { "type": "number", "title": "x" },
+        { "type": "number", "title": "y" },
+        { "type": "number", "title": "z" }
+      ],
+      "maxItems": 3,
+      "description": "Dimensionless unit vector; normalization requires numerical validation."
+    },
+    "ReferencePolyline": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/definitions/NonemptyString" },
+        "name": { "$ref": "#/definitions/NonemptyString" },
+        "kind": { "type": "string", "const": "polyline" },
+        "pointsM": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PointM" },
+          "description": "Ordered points; for a closed curve, do not repeat the first point.",
+          "minItems": 2
+        },
+        "closed": {
+          "type": "boolean",
+          "description": "Whether an additional segment joins the last point to the first."
+        }
+      },
+      "required": ["id", "kind", "pointsM", "closed"],
+      "additionalProperties": false,
+      "description": "An independent piecewise-linear curve, not a mesh-edge constraint, continuous spline, or point-set immersion marker. Arc length is Euclidean in this frame."
+    },
+    "ReferenceState": {
+      "type": "object",
+      "properties": {
+        "heelDeg": {
+          "type": "number",
+          "description": "Positive heel lowers starboard.",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "trimDeg": {
+          "type": "number",
+          "description": "Positive trim raises the bow near upright.",
+          "exclusiveMinimum": -90,
+          "exclusiveMaximum": 90
+        },
+        "waterplaneOffsetM": {
+          "type": "number",
+          "description": "Signed plane offset h: immersed points satisfy (R^T [0,0,1]) dot r <= h. Not draft."
+        }
+      },
+      "required": ["heelDeg", "trimDeg", "waterplaneOffsetM"],
+      "additionalProperties": false,
+      "description": "Design-waterplane hint only. Matches Chartroom hydrostatic-table's rotation R = Rx(heel) Ry(-trim); geometry remains unposed. Not a load or solver setting."
+    },
+    "Source": {
+      "type": "object",
+      "properties": {
+        "tool": { "$ref": "#/definitions/NonemptyString" },
+        "toolVersion": { "$ref": "#/definitions/NonemptyString" },
+        "modelId": { "$ref": "#/definitions/NonemptyString" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "method": {
+          "$ref": "#/definitions/NonemptyString",
+          "description": "Describe discretization, approximation and convergence evidence."
+        },
+        "notes": { "$ref": "#/definitions/Notes" }
+      },
+      "additionalProperties": false
+    },
+    "Notes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/NonemptyString" }
+    }
+  }
+}
