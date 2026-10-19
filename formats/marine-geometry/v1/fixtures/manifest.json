@@ -1,0 +1,39 @@
+[
+  {
+    "file": "invalid/unknown-field.json",
+    "stage": "structural"
+  },
+  {
+    "file": "invalid/fractional-index.json",
+    "stage": "structural"
+  },
+  {
+    "file": "invalid/undisclosed-cap.json",
+    "stage": "structural"
+  },
+  {
+    "file": "invalid/vertex-out-of-range.json",
+    "stage": "semantic",
+    "error": "vertex range"
+  },
+  {
+    "file": "invalid/missing-region.json",
+    "stage": "semantic",
+    "error": "region reference"
+  },
+  {
+    "file": "invalid/overlapping-regions.json",
+    "stage": "semantic",
+    "error": "disjoint regions"
+  },
+  {
+    "file": "invalid/open-envelope.json",
+    "stage": "semantic",
+    "error": "closed, consistently oriented edges"
+  },
+  {
+    "file": "invalid/nonunit-normal.json",
+    "stage": "semantic",
+    "error": "unit normal"
+  }
+]

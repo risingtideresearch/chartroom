@@ -12,6 +12,19 @@
       ],
       "types": "formats/hydrostatic-table/v1/types.ts",
       "schemaType": "HydrostaticTable"
+    },
+    {
+      "format": "marine-geometry",
+      "version": 1,
+      "status": "experimental",
+      "schema": "formats/marine-geometry/v1/schema.json",
+      "specification": "formats/marine-geometry/v1/specification.md",
+      "examples": [
+        "formats/marine-geometry/v1/examples/open-box.json",
+        "formats/marine-geometry/v1/examples/capped-box.json"
+      ],
+      "types": "formats/marine-geometry/v1/types.ts",
+      "schemaType": "MarineGeometry"
     }
   ]
 }

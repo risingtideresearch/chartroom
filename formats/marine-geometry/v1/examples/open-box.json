@@ -1,0 +1,117 @@
+{
+  "$schema": "../schema.json",
+  "format": "marine-geometry",
+  "version": 1,
+  "name": "Open box",
+  "frame": {
+    "axes": "x-forward-y-port-z-up",
+    "originDescription": "Aft bottom centreline; x forward, y port, z up."
+  },
+  "meshes": [
+    {
+      "id": "box",
+      "verticesM": [
+        [0, -1, 0],
+        [4, -1, 0],
+        [4, 1, 0],
+        [0, 1, 0],
+        [0, -1, 2],
+        [4, -1, 2],
+        [4, 1, 2],
+        [0, 1, 2]
+      ],
+      "triangles": [
+        [0, 2, 1],
+        [0, 3, 2],
+        [0, 4, 7],
+        [0, 7, 3],
+        [0, 1, 5],
+        [0, 5, 4],
+        [1, 2, 6],
+        [1, 6, 5],
+        [3, 7, 6],
+        [3, 6, 2]
+      ],
+      "regions": [
+        {
+          "id": "shell",
+          "name": "Bottom and side plating",
+          "representation": "physical",
+          "triangleIndices": [0, 1, 4, 5, 8, 9]
+        },
+        {
+          "id": "transom",
+          "representation": "physical",
+          "triangleIndices": [2, 3]
+        },
+        {
+          "id": "bow",
+          "representation": "physical",
+          "triangleIndices": [6, 7]
+        }
+      ]
+    }
+  ],
+  "bodies": [
+    {
+      "id": "hull",
+      "kind": "hull",
+      "regions": [
+        {
+          "meshId": "box",
+          "regionId": "shell"
+        },
+        {
+          "meshId": "box",
+          "regionId": "transom"
+        },
+        {
+          "meshId": "box",
+          "regionId": "bow"
+        }
+      ],
+      "centerplaneYM": 0
+    }
+  ],
+  "references": [
+    {
+      "id": "keel-baseline",
+      "kind": "plane",
+      "normal": [0, 0, 1],
+      "offsetM": 0
+    },
+    {
+      "id": "aft-datum",
+      "kind": "plane",
+      "normal": [1, 0, 0],
+      "offsetM": 0
+    },
+    {
+      "id": "sheer",
+      "kind": "polyline",
+      "pointsM": [
+        [0, -1, 2],
+        [4, -1, 2],
+        [4, 1, 2],
+        [0, 1, 2]
+      ],
+      "closed": true
+    },
+    {
+      "id": "baseline-origin",
+      "kind": "point",
+      "pointM": [0, 0, 0]
+    }
+  ],
+  "referenceState": {
+    "heelDeg": 0,
+    "trimDeg": 0,
+    "waterplaneOffsetM": 1
+  },
+  "source": {
+    "method": "Exact triangulation of planar box faces."
+  },
+  "notes": [
+    "An open physical shell. No closed envelope is supplied; consumers must not invent a volume or deck."
+  ]
+}
