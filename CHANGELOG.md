@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 - Add experimental marine-geometry v1, authored in TypeScript with a generated
   schema, open/capped box examples, and structural and semantic fixtures.
@@ -8,6 +8,8 @@
   hull-fixed reference geometry for views and measurement consumers.
 - Export its types and dispatch catalog conformance checks by format, retaining
   the existing hydrostatic-table regression tests.
+- Update release metadata and schema identifiers to v0.2.0. Both format versions
+  remain 1; the hydrostatic-table data contract is unchanged.
 
 ## 0.1.1
 

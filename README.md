@@ -17,7 +17,7 @@ Hydrostatic table v1 describes the static buoyancy response of one fixed closed
 hull envelope, independently of a loading condition or water density. It was
 extracted from Camber without changing its structural or physical semantics.
 
-Marine geometry v1 is an unreleased experiment: a whole-geometry mesh snapshot
+Marine geometry v1 is experimental: a whole-geometry mesh snapshot
 with named surface regions, explicit hull bodies, optional closed analysis
 envelopes, and reference geometry. It is intended as source data for views,
 geometric weight estimates, and physics importers—not editable CAD or solver
@@ -25,11 +25,11 @@ caches. It has no dependency on Camber or Boatmath.
 
 ## Consume a GitHub release
 
-After this repository has been pushed and tagged `v0.1.1`:
+After this repository has been pushed and tagged `v0.2.0`:
 
 ```sh
 npm install --save-dev --save-exact \
-  'github:risingtideresearch/chartroom#v0.1.1'
+  'github:risingtideresearch/chartroom#v0.2.0'
 ```
 
 The package name is `@risingtideresearch/chartroom`. It contains committed JSON,
@@ -122,7 +122,7 @@ CI runs these checks and checks the package contents.
 
 ## Versioning and releases
 
-- A **repository/package release** (`v0.1.1`) versions the whole collection.
+- A **repository/package release** (`v0.2.0`) versions the whole collection.
 - A **format version** (`hydrostatic-table/v1`, `"version": 1`) versions one data
   contract. Formats evolve independently.
 - Draft and experimental contracts may change, including incompatibly, but every change must be
@@ -142,9 +142,9 @@ Before a release:
 4. Commit the release, then create and push its annotated tag:
 
 ```sh
-git tag -a v0.1.1 -m "Release v0.1.1"
+git tag -a v0.2.0 -m "Release v0.2.0"
 git push origin main
-git push origin v0.1.1
+git push origin v0.2.0
 ```
 
 There is no npm publishing step. A future npm release can use the same layout.

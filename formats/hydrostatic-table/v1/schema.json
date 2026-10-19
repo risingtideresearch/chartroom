@@ -1,5 +1,5 @@
 {
-  "$id": "https://raw.githubusercontent.com/risingtideresearch/chartroom/v0.1.1/formats/hydrostatic-table/v1/schema.json",
+  "$id": "https://raw.githubusercontent.com/risingtideresearch/chartroom/v0.2.0/formats/hydrostatic-table/v1/schema.json",
   "$comment": "Generated from types.ts. Do not edit; run npm run generate.",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",

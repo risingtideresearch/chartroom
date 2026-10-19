@@ -1,6 +1,6 @@
 {
   "name": "@risingtideresearch/chartroom",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Application-independent marine data contracts, schemas and conformance fixtures",
   "type": "module",
   "license": "UNLICENSED",
